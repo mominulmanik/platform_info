@@ -9,30 +9,30 @@ void main(List<String> args) {
   print(platform.numberOfProcessors);
 
   final design = platform.when<String?>(
-    io: () => platform.when<String>(
+    vm: () => platform.when<String>(
       material: () => 'Android or Fuchsia',
       cupertino: () => 'macOS or iOS',
       orElse: () => 'Windows or Linux',
     ),
-    web: () => 'Web',
+    js: () => 'Web',
   );
   print(design);
 
   final operatingSystem = switch (platform.operatingSystem) {
-    OperatingSystem.android => 'Android',
-    OperatingSystem.fuchsia => 'Fuchsia',
-    OperatingSystem.iOS => 'iOS',
-    OperatingSystem.linux => 'Linux',
-    OperatingSystem.macOS => 'macOS',
-    OperatingSystem.windows => 'Windows',
-    OperatingSystem.unknown => 'Unknown',
+    const OperatingSystem.android() => 'Android',
+    const OperatingSystem.fuchsia() => 'Fuchsia',
+    const OperatingSystem.iOS() => 'iOS',
+    const OperatingSystem.linux() => 'Linux',
+    const OperatingSystem.macOS() => 'macOS',
+    const OperatingSystem.windows() => 'Windows',
+    const OperatingSystem.unknown() || _ => 'Unknown',
   };
   print(operatingSystem);
 
   final buildMode = switch (platform.buildMode) {
-    BuildMode.debug => 'Debug',
-    BuildMode.profile => 'Profile',
-    BuildMode.release => 'Release',
+    BuildMode$Debug _ => 'Debug',
+    BuildMode$Profile _ => 'Profile',
+    BuildMode$Release _ => 'Release',
   };
   print(buildMode);
 }

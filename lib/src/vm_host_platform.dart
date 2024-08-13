@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io' as io show Platform;
+import 'dart:io' as io;
 
 import 'base_host_platform.dart';
 import 'constants.dart';
@@ -10,42 +10,31 @@ HostPlatform getHostPlatform() => _HostPlatform$IO._();
 
 /// i/o based host platform
 final class _HostPlatform$IO extends HostPlatform {
-  _HostPlatform$IO._();
+  _HostPlatform$IO._()
+      : operatingSystem = _getOS(),
+        version = _getVersion(),
+        locale = _getLocale(),
+        numberOfProcessors = _numberOfProcessors();
 
   static bool get _isUnknownEnvironment =>
       Zone.current[#platform_info_test.isUnknownEnvironment] as bool? ?? false;
 
   static bool get _isKnownEnvironment => !_isUnknownEnvironment;
 
-  @override
-  final HostPlatformType type = HostPlatformType.io;
-
-  @override
-  final OperatingSystem operatingSystem = _getOS();
-
-  @override
-  final String version = _getVersion();
-
-  @override
-  final String locale = _getLocale();
-
-  @override
-  final int numberOfProcessors = _numberOfProcessors();
-
   static OperatingSystem _getOS() {
     if (_isKnownEnvironment) {
       if (io.Platform.isFuchsia) {
-        return OperatingSystem.fuchsia;
+        return const OperatingSystem.fuchsia();
       } else if (io.Platform.isWindows) {
-        return OperatingSystem.windows;
+        return const OperatingSystem.windows();
       } else if (io.Platform.isAndroid) {
-        return OperatingSystem.android;
+        return const OperatingSystem.android();
       } else if (io.Platform.isMacOS) {
-        return OperatingSystem.macOS;
+        return const OperatingSystem.macOS();
       } else if (io.Platform.isIOS) {
-        return OperatingSystem.iOS;
+        return const OperatingSystem.iOS();
       } else if (io.Platform.isLinux) {
-        return OperatingSystem.linux;
+        return const OperatingSystem.linux();
       }
     }
     return kDefaultHostPlatform.operatingSystem;
@@ -72,4 +61,19 @@ final class _HostPlatform$IO extends HostPlatform {
     }
     return lang;
   }
+
+  @override
+  final HostPlatformType type = const HostPlatformType.vm();
+
+  @override
+  final OperatingSystem operatingSystem;
+
+  @override
+  final String version;
+
+  @override
+  final String locale;
+
+  @override
+  final int numberOfProcessors;
 }

@@ -1,93 +1,91 @@
 import 'dart:async';
-import 'dart:html' as html show window;
 
 import 'package:meta/meta.dart' show immutable, internal;
+import 'package:web/web.dart' as web show window;
 
 import 'base_host_platform.dart';
 import 'constants.dart';
 import 'enums.dart';
 
-/// Get host platform if dart.library.html available
+/// Get host platform if dart.library.js_interop available
 @internal
 HostPlatform getHostPlatform() => _HostPlatform$Web._();
 
 /// Web based host platform
 @immutable
 final class _HostPlatform$Web extends HostPlatform {
-  _HostPlatform$Web._();
+  _HostPlatform$Web._()
+      : type = const HostPlatformType.js(),
+        operatingSystem = _getOS(),
+        version = _getVersion(),
+        locale = _getLocale(),
+        numberOfProcessors = _numberOfProcessors();
 
   static bool get _isUnknownEnvironment =>
       Zone.current[#platform_info_test.isUnknownEnvironment] as bool? ?? false;
 
   static bool get _isKnownEnvironment => !_isUnknownEnvironment;
 
-  @override
-  final HostPlatformType type = HostPlatformType.web;
-
-  @override
-  final OperatingSystem operatingSystem = _getOS();
-
-  @override
-  final String version = _getVersion();
-
-  @override
-  final String locale = _getLocale();
-
-  @override
-  final int numberOfProcessors = _numberOfProcessors();
-
   static OperatingSystem _getOS() {
     if (_isKnownEnvironment) {
       final appVersion = _getVersion().toLowerCase();
       if (appVersion.contains('fuchsia')) {
-        return OperatingSystem.fuchsia;
+        return const OperatingSystem.fuchsia();
       } else if (appVersion.contains('mac')) {
-        return OperatingSystem.macOS;
+        return const OperatingSystem.macOS();
       } else if (appVersion.contains('win')) {
-        return OperatingSystem.windows;
+        return const OperatingSystem.windows();
       } else if (appVersion.contains('android')) {
-        return OperatingSystem.android;
+        return const OperatingSystem.android();
       } else if (appVersion.contains('iphone')) {
-        return OperatingSystem.iOS;
+        return const OperatingSystem.iOS();
       } else if (appVersion.contains('ios')) {
-        return OperatingSystem.iOS;
+        return const OperatingSystem.iOS();
       } else if (appVersion.contains('linux')) {
-        return OperatingSystem.linux;
+        return const OperatingSystem.linux();
       }
     }
     return kDefaultHostPlatform.operatingSystem;
   }
 
   static String _getVersion() => <String>[
-        html.window.navigator.userAgent,
-        html.window.navigator.appVersion,
-        html.window.navigator.platform ?? '',
+        web.window.navigator.userAgent,
+        web.window.navigator.appVersion,
+        web.window.navigator.platform,
       ].firstWhere(
         (v) => _isKnownEnvironment && v.isNotEmpty,
         orElse: () => kDefaultHostPlatform.version,
       );
 
-  static int _numberOfProcessors() {
-    if (_isKnownEnvironment) {
-      final numberOfProcessors = html.window.navigator.hardwareConcurrency;
-      if (numberOfProcessors != null) {
-        return numberOfProcessors;
-      }
-    }
-    return kDefaultHostPlatform.numberOfProcessors;
-  }
+  static int _numberOfProcessors() => _isKnownEnvironment
+      ? web.window.navigator.hardwareConcurrency
+      : kDefaultHostPlatform.numberOfProcessors;
 
   static String _getLocale() {
-    final lang = html.window.navigator.language
+    final lang = web.window.navigator.language
         .split('-')
         .first
         .split('_')
         .first
         .trim()
         .toLowerCase();
-    if (_isUnknownEnvironment || lang.length != 2) {
-      return kDefaultHostPlatform.locale;
-    }
-    return lang;
+    return _isUnknownEnvironment || lang.length != 2
+        ? kDefaultHostPlatform.locale
+        : lang;
   }
+
+  @override
+  final HostPlatformType type;
+
+  @override
+  final OperatingSystem operatingSystem;
+
+  @override
+  final String version;
+
+  @override
+  final String locale;
+
+  @override
+  final int numberOfProcessors;
 }
